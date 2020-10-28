@@ -16,6 +16,7 @@ resource "aws_instance" "worker" {
   }
 
   tags = {
+    name                    = "worker${count.index}"
     worker                  = "true"
     kubernetes-the-hard-way = "true"
     type                    = "worker"

@@ -16,6 +16,7 @@ resource "aws_instance" "controller" {
   }
 
   tags = {
+    name                    = "controller${count.index}"
     controller              = "true"
     kubernetes-the-hard-way = "true"
     type                    = "controller"
