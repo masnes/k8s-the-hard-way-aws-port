@@ -7,8 +7,9 @@ resource "aws_instance" "controller" {
 
   subnet_id = aws_subnet.k8s.id
 
-  source_dest_check = false # Equivalent to '--can-ip-forward' in gcloud
-  private_ip        = "10.240.0.1${count.index}"
+  source_dest_check           = false # Equivalent to '--can-ip-forward' in gcloud
+  private_ip                  = "10.240.0.1${count.index}"
+  associate_public_ip_address = true
 
   root_block_device {
     volume_size = 200
