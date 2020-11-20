@@ -1,0 +1,98 @@
+---
+- name: "Files dir should exist"
+  file:
+    path: "{{playbook_dir}}/files"
+    state: directory
+- name: Create ca-config.json
+  template:
+    src: ca-config.json.j2
+    dest: "{{playbook_dir}}/files/ca-config.json"
+  notify:
+    - "Gen CA Cert"
+- name: Create ca-csr.json
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/ca-csr.json"
+  vars:
+    csr_CN: "Kubernetes"
+    csr_O: "Kubernetes"
+  notify:
+    - "Gen CA Cert"
+
+- name: create admin-csr.json
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/admin-csr.json"
+  vars:
+    csr_CN: "admin"
+    csr_O: "system:masters"
+  notify:
+    - "Gen Admin Cert"
+
+- name: create worker csrs
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/worker-{{item}}-csr.json"
+  vars:
+    csr_CN: "system:node:{{item}}"  # TODO: does this break?
+    csr_O: "system:nodes"
+  with_items:
+    - 0
+    - 1
+    - 2
+  notify:
+    - "Gen Worker Certs"
+
+- name: create controller manager client csr
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/kube-controller-manager-csr.json"
+  vars:
+    csr_CN: "system:kube-controller-manager"
+    csr_O: "system:kube-controller-manager"
+  notify:
+    - "Gen Controller Manager Client Certificate"
+
+- name: create kube proxy client csr
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/kube-proxy-csr.json"
+  vars:
+    csr_CN: "system:kube-proxy"
+    csr_O: "system:node-proxier"
+  notify:
+    - "Gen Kube Proxy Client Certificate"
+
+- name: create scheduler client csr
+  template:
+    src: generic-csr.json.j2
+    dest: "{{playbook_dir}}/files/kube-scheduler-csr.json"
+  vars:
+    csr_CN: "system:kube-scheduler"
+    csr_O: "system:kube-scheduler"
+  notify:
+    - "Gen Scheduler Client Certificate"
+
+
+- block:
+  - name: create api server csr
+    template:
+      src: generic-csr.json.j2
+      dest: "{{playbook_dir}}/files/kubernetes-csr.json"
+    vars:
+      csr_CN: "kubernetes"
+      csr_O: "Kubernetes"
+  - name: Gen Kubernetes API Server Certificate
+    shell:
+      cmd: >
+        cfssl gencert
+        -ca=ca.pem
+        -ca-key=ca-key.pem
+        -config=ca-config.json
+        -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,{{kubernetes_public_address}},127.0.0.1,{{kubernetes_hostnames}}
+        -profile=kubernetes
+        kubernetes-csr.json | cfssljson -bare kubernetes
+    chdir: "{{playbook_dir}}/files"
+  vars:
+    kubernetes_public_address: "todo"
+    kubernetes_hostnames: "todo"

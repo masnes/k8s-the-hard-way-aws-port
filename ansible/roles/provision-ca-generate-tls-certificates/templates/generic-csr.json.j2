@@ -1,5 +1,5 @@
 {
-  "CN": "admin",
+  "CN": "{{csr_CN}}",
   "key": {
     "algo": "rsa",
     "size": 2048
@@ -8,7 +8,7 @@
     {
       "C": "US",
       "L": "Boulder",
-      "O": "system:masters",
+      "O": "{{csr_O}}",
       "OU": "Kubernetes The Hard Way",
       "ST": "Colorado"
     }
