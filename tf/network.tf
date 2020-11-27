@@ -18,6 +18,17 @@ resource "aws_internet_gateway" "k8s" {
   }
 }
 
+resource "aws_route_table" "k8s" {
+  vpc_id = aws_vpc.k8s.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.k8s.id
+  }
+  tags = {
+    Name = "K8s Basic VPC Route Table"
+  }
+}
+
 resource "aws_subnet" "k8s" {
   vpc_id            = aws_vpc.k8s.id
   cidr_block        = aws_vpc.k8s.cidr_block
