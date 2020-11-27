@@ -28,12 +28,12 @@ resource "local_file" "ansible_hosts" {
   content              = <<-EOT
 [workers]
 %{for index, worker in aws_instance.worker.*~}
-worker-${index} ansible_host=${worker.public_ip}
+worker-${index} ansible_host=${worker.public_ip} public_ip=${worker.public_ip} internal_ip=${worker.private_ip}
 %{endfor~}
 
 [controllers]
 %{for index, controller in aws_instance.controller.*~}
-controller-${index} ansible_host=${controller.public_ip}
+controller-${index} ansible_host=${controller.public_ip} public_ip=${controller.public_ip} internal_ip=${controller.private_ip}
 %{endfor~}
 EOT
 
