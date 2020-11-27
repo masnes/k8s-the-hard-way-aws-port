@@ -10,6 +10,14 @@ resource "aws_vpc" "k8s" {
   enable_dns_hostnames = true
 }
 
+resource "aws_internet_gateway" "k8s" {
+  vpc_id = aws_vpc.k8s.id
+
+  tags = {
+    Name = "k8s"
+  }
+}
+
 resource "aws_subnet" "k8s" {
   vpc_id            = aws_vpc.k8s.id
   cidr_block        = aws_vpc.k8s.cidr_block
