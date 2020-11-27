@@ -23,13 +23,13 @@ resource "local_file" "ansible_hosts" {
   filename = "${path.module}/../ansible/hosts"
   content  = <<-EOT
 [workers]
-%{for worker in aws_instance.worker.*~}
-worker-${worker.index_key} ansible_host=${worker.public_ip}
+%{for worker in aws_instance.worker.* ~}
+worker-${worker.index} ansible_host=${worker.public_ip}
 %{endfor~}
 
 [controllers]
-%{for controller in aws_instance.controller.*~}
-controller-${controller.index_key} ansible_host=${controller.public_ip}
+%{for controller in aws_instance.controller.* ~}
+controller-${controller.index} ansible_host=${controller.public_ip}
 %{endfor~}
 EOT
 
