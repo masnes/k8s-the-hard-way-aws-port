@@ -2,7 +2,7 @@ resource "local_file" "kubernetes_public_address" {
   depends_on = [
     aws_eip.k8s_external
   ]
-  filename             = "${path.module}/../ansible/group_vars/all/kubernetes_public_address.yml"
+  filename             = "${path.module}/../../ansible/group_vars/all/kubernetes_public_address.yml"
   file_permission      = "0644"
   directory_permission = "0755"
   content              = <<-EOT
@@ -22,7 +22,7 @@ resource "local_file" "ansible_hosts" {
     aws_instance.worker[2],
   ]
 
-  filename             = "${path.module}/../ansible/hosts"
+  filename             = "${path.module}/../../ansible/hosts"
   file_permission      = "0644"
   directory_permission = "0755"
   content              = <<-EOT
