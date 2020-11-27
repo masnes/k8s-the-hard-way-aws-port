@@ -29,11 +29,6 @@ resource "aws_route_table" "k8s" {
   }
 }
 
-resource "aws_main_route_table_association" "k8s" {
-  vpc_id         = aws_vpc.k8s.id
-  route_table_id = aws_route_table.k8s.id
-}
-
 resource "aws_subnet" "k8s" {
   vpc_id            = aws_vpc.k8s.id
   cidr_block        = aws_vpc.k8s.cidr_block
@@ -43,6 +38,12 @@ resource "aws_subnet" "k8s" {
     Name = "k8s"
   }
 }
+
+resource "aws_route_table_association" "k8s" {
+  subnet_id      = aws_subnet.k8s.id
+  route_table_id = aws_route_table.k8s.id
+}
+
 
 resource "aws_security_group" "k8s" {
   name        = "k8s"
