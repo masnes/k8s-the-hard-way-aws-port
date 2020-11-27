@@ -30,7 +30,7 @@ resource "aws_route_table" "k8s" {
 }
 
 resource "aws_main_route_table_association" "k8s" {
-  vpc_id = aws_vpc.k8s.id
+  vpc_id         = aws_vpc.k8s.id
   route_table_id = aws_route_table.k8s.id
 }
 
