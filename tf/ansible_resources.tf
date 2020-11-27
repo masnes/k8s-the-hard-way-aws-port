@@ -9,4 +9,28 @@ kubernetes_public_address: "${aws_eip.k8s_external.public_ip}"
 EOT
 }
 
+resource "local_file" "ansible_hosts" {
+
+  depends_on = [
+    aws_instance.controller[0],
+    aws_instance.controller[1],
+    aws_instance.controller[2],
+    aws_instance.worker[0],
+    aws_instance.worker[1],
+    aws_instance.worker[2],
+  ]
+
+  filename = "${path.module}/../ansible/hosts"
+  content = <<-EOT
+[workers]
+%{ for worker in aws_instance.worker.* ~}
+worker-${worker.index_key} ansible_host=${worker.public_ip}
+%{ endfor ~}
+
+[controllers]
+%{ for controller in aws_instance.controller.* ~}
+controller-${controller.index_key} ansible_host=${controller.public_ip}
+%{ endfor ~}
+EOT
+
 }
