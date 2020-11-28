@@ -1,0 +1,38 @@
+- name: Populate HostVars for workers and controllers
+  hosts: workers:controllers
+  tasks: []
+
+- name: Provision CA and Generate TLS Certificates
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - role: provision-ca-generate-tls-certificates
+
+- name: Deploy Worker Certificates
+  hosts: workers
+  tasks:
+    - name: Deploy Certificates
+      file:
+        src: "{{item}}"
+        dest: "{{ansible_env.HOME}}/{{item}}"
+        mode: "0750"
+      loop:
+        - ca.pem
+        - "{{ansible_hostname}}-key.pem"
+        - "{{ansible_hostname}}.pem"
+
+- name: Deploy Controller Certificates
+  hosts: controllers
+  tasks:
+    - name: Deploy Extra certs for controllers
+      file:
+        src: "{{item}}"
+        dest: "{{ansible_env.HOME}}/{{item}}"
+        mode: "0750"
+      loop:
+        - ca.pem
+        - ca-key.pem
+        - kubernetes-key.pem
+        - kubernetes.pem
+        - service-account-key.pem
+        - service-account.pem
