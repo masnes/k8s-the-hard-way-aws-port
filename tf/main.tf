@@ -5,13 +5,13 @@ variable "allowed_ips" {
 }
 
 variable "authorized_key_path" {
-  type = string
+  type        = string
   description = "The path to the public ssh key associated with your private key which you will use to connect to nodes in the cluster."
-  default = "~/.ssh/id_rsa.pub"
+  default     = "~/.ssh/id_rsa.pub"
 }
 
 module "key" {
-  source = "./key"
+  source              = "./key"
   authorized_key_path = var.authorized_key_path
 }
 
@@ -19,5 +19,5 @@ module "k8s" {
   source = "./k8s"
 
   allowed_ips = var.allowed_ips
-  key_name = module.key.key_name
+  key_name    = module.key.key_name
 }
