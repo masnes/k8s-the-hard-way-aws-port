@@ -1,5 +1,5 @@
 data "local_file" "provided_public_key" {
-  filename = var.authorized_key_path
+  filename = pathexpand(var.authorized_key_path)
 }
 
 resource "aws_key_pair" "k8s_user_provided_key" {
