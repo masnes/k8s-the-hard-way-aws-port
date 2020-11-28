@@ -18,8 +18,8 @@
         mode: "0750"
       loop:
         - ca.pem
-        - "{{ansible_hostname}}-key.pem"
-        - "{{ansible_hostname}}.pem"
+        - "{{inventory_hostname}}-key.pem"
+        - "{{inventory_hostname}}.pem"
 
 - name: Deploy Controller Certificates
   hosts: controllers
