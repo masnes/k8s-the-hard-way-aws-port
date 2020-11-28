@@ -48,11 +48,9 @@
     csr_CN: "system:node:{{item}}"  # TODO: does this break?
     csr_O: "system:nodes"
   with_items:
-    - 0
-    - 1
-    - 2
-- debug:
-    msg: "{{hostvars['worker-0'].public_ip}}"
+    - "0"
+    - "1"
+    - "2"
 - name: Gen Worker Certs
   shell:
     cmd: >-
@@ -60,15 +58,15 @@
       -ca=ca.pem
       -ca-key=ca-key.pem
       -config=ca-config.json
-      -hostname=worker-{{item}},{{hostvars["worker-{{item}}"].public_ip}},{{hostvars["worker-{{item}}"].internal_ip}}
+      -hostname=worker-{{item}},{{hostvars["worker-"+item].public_ip}},{{hostvars["worker-"+item].internal_ip}}
       -profile=kubernetes
       worker-{{item}}-csr.json | cfssljson -bare worker-{{item}}
     chdir: "{{playbook_dir}}/files"
     creates: "{{playbook_dir}}/files/worker-{{item}}.pem"
   loop:
-    - 0
-    - 1
-    - 2
+    - "0"
+    - "1"
+    - "2"
 
 - name: create controller manager client csr
   template:
@@ -158,8 +156,6 @@
   vars:
     csr_CN: service-accounts
     csr_O: Kubernetes
-  notify:
-    - "Gen Service Account Certificate"
 - name: Gen Service Account Certificate
   shell:
     cmd: >
