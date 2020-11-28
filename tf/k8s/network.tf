@@ -1,9 +1,3 @@
-variable "allowed_ips" {
-  type        = list(string)
-  description = "A list of one or more ip addresses (not cidr's) that you will be accessing from."
-  default     = ["73.78.216.54"]
-}
-
 resource "aws_vpc" "k8s" {
   cidr_block           = "10.240.0.0/24"
   enable_dns_support   = true
