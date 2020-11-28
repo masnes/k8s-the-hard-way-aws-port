@@ -3,6 +3,8 @@ resource "aws_instance" "worker" {
 
   ami = "ami-032ed93ef3b2a867c" # Ubuntu 20.04 amd64
 
+  key_name = var.key_name
+
   instance_type = "t2.nano" # TODO: this will need to be beefed up but keep it cheap for now
 
   subnet_id = aws_subnet.k8s.id
