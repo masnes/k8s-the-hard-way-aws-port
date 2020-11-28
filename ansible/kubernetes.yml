@@ -12,7 +12,7 @@
   hosts: workers
   tasks:
     - name: Deploy Certificates
-      file:
+      copy:
         src: "{{item}}"
         dest: "{{ansible_env.HOME}}/{{item}}"
         mode: "0750"
@@ -25,7 +25,7 @@
   hosts: controllers
   tasks:
     - name: Deploy Extra certs for controllers
-      file:
+      copy:
         src: "{{item}}"
         dest: "{{ansible_env.HOME}}/{{item}}"
         mode: "0750"
