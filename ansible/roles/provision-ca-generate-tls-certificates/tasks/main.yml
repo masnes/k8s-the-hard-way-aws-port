@@ -3,28 +3,37 @@
   file:
     path: "{{playbook_dir}}/files"
     state: directory
+- name: "files csr dir should exist"
+  file:
+    path: "{{playbook_dir}}/files/csr"
+    state: directory
+- name: "secure dir should exist"
+  file:
+    path: "{{playbook_dir}}/files/secure"
+    state: directory
+    mode: "0700"
 - name: Create ca-config.json
   template:
     src: ca-config.json.j2
-    dest: "{{playbook_dir}}/files/ca-config.json"
+    dest: "{{playbook_dir}}/files/csr/ca-config.json"
 - name: Create ca-csr.json
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/ca-csr.json"
+    dest: "{{playbook_dir}}/files/csr/ca-csr.json"
   vars:
     csr_CN: "Kubernetes"
     csr_O: "Kubernetes"
 - name: Gen CA Cert
   shell:
     cmd: |
-      cfssl gencert -initca ca-csr.json | cfssljson -bare ca
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/ca.pem"
+      cfssl gencert -initca ../csr/ca-csr.json | cfssljson -bare ca
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/ca.pem"
 
 - name: create admin-csr.json
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/admin-csr.json"
+    dest: "{{playbook_dir}}/files/csr/admin-csr.json"
   vars:
     csr_CN: "admin"
     csr_O: "system:masters"
@@ -34,16 +43,16 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -profile=kubernetes
-      admin-csr.json | cfssljson -bare admin
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/admin.pem"
+      ../csr/admin-csr.json | cfssljson -bare admin
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/admin.pem"
 
 - name: create worker csrs
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/worker-{{item}}-csr.json"
+    dest: "{{playbook_dir}}/files/csr/worker-{{item}}-csr.json"
   vars:
     csr_CN: "system:node:{{item}}"  # TODO: does this break?
     csr_O: "system:nodes"
@@ -57,12 +66,12 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -hostname=worker-{{item}},{{hostvars["worker-"+item].public_ip}},{{hostvars["worker-"+item].internal_ip}}
       -profile=kubernetes
-      worker-{{item}}-csr.json | cfssljson -bare worker-{{item}}
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/worker-{{item}}.pem"
+      ../csr/worker-{{item}}-csr.json | cfssljson -bare worker-{{item}}
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/worker-{{item}}.pem"
   loop:
     - "0"
     - "1"
@@ -71,7 +80,7 @@
 - name: create controller manager client csr
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/kube-controller-manager-csr.json"
+    dest: "{{playbook_dir}}/files/csr/kube-controller-manager-csr.json"
   vars:
     csr_CN: "system:kube-controller-manager"
     csr_O: "system:kube-controller-manager"
@@ -81,17 +90,17 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -profile=kubernetes
-      kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/kube-controller-manager.pem"
+      ../csr/kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/kube-controller-manager.pem"
 
 
 - name: create kube proxy client csr
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/kube-proxy-csr.json"
+    dest: "{{playbook_dir}}/files/csr/kube-proxy-csr.json"
   vars:
     csr_CN: "system:kube-proxy"
     csr_O: "system:node-proxier"
@@ -101,16 +110,16 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -profile=kubernetes
-      kube-proxy-csr.json | cfssljson -bare kube-proxy
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/kube-proxy.pem"
+      ../csr/kube-proxy-csr.json | cfssljson -bare kube-proxy
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/kube-proxy.pem"
 
 - name: create scheduler client csr
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/kube-scheduler-csr.json"
+    dest: "{{playbook_dir}}/files/csr/kube-scheduler-csr.json"
   vars:
     csr_CN: "system:kube-scheduler"
     csr_O: "system:kube-scheduler"
@@ -120,16 +129,16 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -profile=kubernetes
-      kube-scheduler-csr.json | cfssljson -bare kube-scheduler
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/kube-scheduler.pem"
+      ../csr/kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/kube-scheduler.pem"
 
 - name: create api server csr
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/kubernetes-csr.json"
+    dest: "{{playbook_dir}}/files/csr/kubernetes-csr.json"
   vars:
     csr_CN: "kubernetes"
     csr_O: "Kubernetes"
@@ -139,12 +148,12 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -hostname=10.32.0.1,10.240.0.10,10.240.0.11,10.240.0.12,{{kubernetes_public_address}},127.0.0.1,{{kubernetes_hostnames}}
       -profile=kubernetes
-      kubernetes-csr.json | cfssljson -bare kubernetes
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/kubernetes.pem"
+      ../csr/kubernetes-csr.json | cfssljson -bare kubernetes
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/kubernetes.pem"
   vars:
     # kubernetes_public_address generated by tf ansible_resources.tf to group_vars/all/kubernetes_public_address.yml
     kubernetes_hostnames: "kubernetes,kubernetes.default,kubernetes.default.svc,kubernetes.default.svc.cluster,kubernetes.svc.cluster.local"
@@ -152,7 +161,7 @@
 - name: create service account csr
   template:
     src: generic-csr.json.j2
-    dest: "{{playbook_dir}}/files/service-account-csr.json"
+    dest: "{{playbook_dir}}/files/csr/service-account-csr.json"
   vars:
     csr_CN: service-accounts
     csr_O: Kubernetes
@@ -162,8 +171,8 @@
       cfssl gencert
       -ca=ca.pem
       -ca-key=ca-key.pem
-      -config=ca-config.json
+      -config=../csr/ca-config.json
       -profile=kubernetes
-      service-account-csr.json | cfssljson -bare service-account
-    chdir: "{{playbook_dir}}/files"
-    creates: "{{playbook_dir}}/files/service-account.pem"
+      ../csr/service-account-csr.json | cfssljson -bare service-account
+    chdir: "{{playbook_dir}}/files/secure"
+    creates: "{{playbook_dir}}/files/secure/service-account.pem"

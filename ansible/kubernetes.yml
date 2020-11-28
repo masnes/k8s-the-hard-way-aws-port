@@ -13,7 +13,7 @@
   tasks:
     - name: Deploy Certificates
       copy:
-        src: "{{item}}"
+        src: "secure/{{item}}"
         dest: "{{ansible_env.HOME}}/{{item}}"
         mode: "0750"
       loop:
@@ -26,7 +26,7 @@
   tasks:
     - name: Deploy Extra certs for controllers
       copy:
-        src: "{{item}}"
+        src: "secure/{{item}}"
         dest: "{{ansible_env.HOME}}/{{item}}"
         mode: "0750"
       loop:
