@@ -20,6 +20,8 @@
         - ca.pem
         - "{{inventory_hostname}}-key.pem"
         - "{{inventory_hostname}}.pem"
+  tags:
+    - certificates
 
 - name: Deploy Controller Certificates
   hosts: controllers
