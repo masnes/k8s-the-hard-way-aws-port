@@ -7,6 +7,8 @@
   connection: local
   roles:
     - role: provision-ca-generate-tls-certificates
+  tags:
+    - certificates
 
 - name: Deploy Worker Certificates
   hosts: workers
