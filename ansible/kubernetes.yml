@@ -40,3 +40,70 @@
         - kubernetes.pem
         - service-account-key.pem
         - service-account.pem
+  tags:
+    - certificates
+
+- name: Generate Kubernetes Configuration Files for Authentication
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: "worker nodes - slightly custom config"
+      include_role: generate-k8s-config-files-for-auth
+      vars:
+        conffile:
+          target: "node {{item}}"
+          server_url: "https://{{kubernetes_public_address}}:6443"
+          kubeconfig: "{{item}}.kubeconfig"
+          client_certificate: "{{item}}.pem"
+          client_key: "{{item}}-key.pem"
+          credential_target: "node:{{item}}"
+      loop:
+        - "worker-0"
+        - "worker-1"
+        - "worker-2"
+    - name: "generalized configs (all non worker nodes)"
+      include_role: generate-k8s-config-files-for-auth
+      vars:
+        conffile:
+          target: "{{item.name}}"
+          server_url: "{{item.url}}"
+          kubeconfig: "{{item.name}}.kubeconfig"
+          client_certificate: "{{item.name}}.pem"
+          client_key: "{{item.name}}-key.pem"
+          credential_target: "{{item.name}}"
+      loop:
+        - { name: "kube-proxy", url: "https://{{kubernetes_public_address}}:6443" }
+        - { name: "kube-controller-manager", url: "https://127.0.0.1:6443" }
+        - { name: "kube-scheduler", url: "https://127.0.0.1:6443" }
+        - { name: "kube-scheduler", url: "https://127.0.0.1:6443" }
+  tags:
+    - auth_config_files
+
+
+- name: Deploy Worker Config Files
+  hosts: workers
+  tasks:
+    - name: "Deploy worker configs"
+      copy:
+        src: "kubeconfig/{{item}}"
+        dest: "{{ansible_env.HOME}}/{{item}}"
+      loop:
+        - "{{inventory_hostname}}.kubeconfig"
+        - "kube-proxy.kubeconfig"
+  tags:
+    - auth_config_files
+
+- name: Deploy Controller Config Files
+  hosts: controllers
+  tasks:
+    - name: Deploy Controller Configs
+      copy:
+        src: "kubeconfig/{{item}}"
+        dest: "{{ansible_env.HOME}}/{{item}}"
+      loop:
+        - "{{inventory_hostname}}.kubeconfig"
+        - "admin.kubeconfig"
+        - "kube-controller-manager.kubeconfig"
+        - "kube-scheduler.kubeconfig"
+  tags:
+    - auth_config_files

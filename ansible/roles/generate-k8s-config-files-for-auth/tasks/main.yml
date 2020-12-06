@@ -1,0 +1,28 @@
+---
+- name: Ensure local kubeconfig files dir exists
+  file:
+    path: "{{playbook_dir}}/files/kubeconfig"
+    state: directory
+
+- name: Update {{conffile.target}} Kubernetes Configuration file
+  shell: |
+    kubectl config set-cluster kubernetes-the-hard-way \
+    --certificate-authority=../secure/ca.pem \
+    --embeded-certs=true \
+    --server={{conffile.server_url}} \
+    --kubeconfig={{conffile.kubeconfig}}
+
+    kubectl config set-credentials system:{{conffile.credential_target}} \
+    --client-certificate=../secure/{{conffile.client_certificate}} \
+    --client-key=../secure/{{conffile.client_key}} \
+    --embed-certs=true \
+    --kubeconfig={{conffile.kubeconfig}}
+
+    kubectl config set-context default \
+    --cluster=kubernetes-the-hard-way \
+    --user=system:{{conffile.credential_target}} \
+    --kubeconfig={{conffile.kubeconfig}}
+
+    kubectl config use-context default --kubeconfig={{conffile.kubeconfig}}
+
+    chdir: "{{playbook_dir}}/files/kubeconfig
