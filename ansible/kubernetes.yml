@@ -126,3 +126,16 @@
         - "kube-scheduler.kubeconfig"
   tags:
     - auth_config_files
+
+- name: "Create The Encryption Config File, locally, if it does not already exist"
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - data-encryption-config-and-key
+
+- name: "Deploy the Encryption Config File"
+  hosts: controllers
+  copy:
+    src: secure/encryption-config.yaml
+    dest: "/var/lib/k8s_secrets/encryption-config.yaml"
+    mode: "600"

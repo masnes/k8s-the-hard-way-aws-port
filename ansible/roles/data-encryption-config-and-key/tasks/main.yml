@@ -1,0 +1,13 @@
+---
+- name: "Retrieve a candidate encryption key"
+  shell: "head -c 32 /dev/urandom | base64"
+  changed_when: false
+  register: candidate_encryption_key
+
+- name: "Generate the encryption-config.yaml"
+  template:
+    # One key is fine, don't change it if it exists
+    force: false
+    src: "encryption-config.yaml.j2"
+    dest: "{{playbook_dir}}/files/secure/encryption-config.yaml"
+    mode: "0600"
