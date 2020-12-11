@@ -10,14 +10,33 @@
   tags:
     - certificates
 
+- name: "Create secrets directory for all servers"
+  hosts: all
+  become: true
+  tasks:
+    - name: "Create /var/lib/k8s_secrets"
+      file:
+        path: "/var/lib/k8s_secrets"
+        state: directory
+        owner: root
+        group: root
+        mode: "700"
+    - name: "Install ACL package for granting additional access to services that require it"
+      apt:
+        name: "acl"
+        state: "present"
+
 - name: Deploy Worker Certificates
   hosts: workers
+  become: yes
   tasks:
     - name: Deploy Certificates
       copy:
-        src: "secure/{{item}}"
-        dest: "{{ansible_env.HOME}}/{{item}}"
-        mode: "0750"
+        src: "secrets/{{item}}"
+        dest: "/var/lib/k8s_secrets/{{item}}"
+        mode: "750"
+        owner: root
+        group: root
       loop:
         - ca.pem
         - "{{inventory_hostname}}-key.pem"
@@ -31,8 +50,8 @@
     - name: Deploy Extra certs for controllers
       copy:
         src: "secure/{{item}}"
-        dest: "{{ansible_env.HOME}}/{{item}}"
-        mode: "0750"
+        dest: "/var/lib/k8s_secrets/{{item}}"
+        mode: "750"
       loop:
         - ca.pem
         - ca-key.pem
