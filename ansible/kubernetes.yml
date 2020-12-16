@@ -143,3 +143,10 @@
         dest: "/var/lib/k8s_secrets/encryption-config.yaml"
         mode: "600"
 
+- name: "Bootstrap etcd"
+  hosts: controllers
+  become: yes
+  roles:
+    - role: "bootstrap-etcd-cluster"
+  tags:
+    - etcd

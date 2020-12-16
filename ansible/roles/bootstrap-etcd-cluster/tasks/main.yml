@@ -1,0 +1,65 @@
+---
+- name: "Install etcd-server"
+  apt:
+    name: "etcd-server"
+    state: "latest"
+
+- name: "Install etcd-client"
+  apt:
+    name: "etcd-client"
+    state: "latest"
+
+- name: "Set custom etcd.service"
+  template:
+    src: etcd.service.j2
+    dest: /etc/systemd/system/etcd.service
+    owner: root
+    group: root
+    mode: "0644"
+  register: etcd_service
+
+- name: "Add etcd acls for k8s_secrets dir"
+  ansible.posix.acl:
+    path: /var/lib/k8s_secrets
+    entity: etcd
+    etype: user
+    permissions: rx
+
+- name: "Add etcd acls for needed files in k8s_secrets dir"
+  ansible.posix.acl:
+    path: "/var/lib/k8s_secrets/{{item}}"
+    entity: etcd
+    etype: user
+    permissions: r
+  loop:
+    - "kubernetes.pem"
+    - "kubernetes-key.pem"
+    - "ca.pem"
+
+- name: "Enable and Start etcd"
+  systemd:
+    name: "etcd.service"
+    enabled: yes
+    state: started
+    daemon_reload: "{{etcd_service.changed}}"
+
+- name: "Record Key etcd details for verification"
+  shell:
+    cmd: >-
+      ETCDCTL_API=3 etcdctl member list
+      --endpoints=https://127.0.0.1:2379
+      --cacert=/var/lib/k8s_secrets/ca.pem
+      --cert=/var/lib/k8s_secrets/kubernetes.pem
+      --key=/etc/etcd/kubernetes-key.pem
+  register: etcd_member
+
+- name: "etcd out:"
+  debug:
+    msg: "{{etcd_member}}"
+
+- name: "Check that etcd output contains our controllers"
+  assert:
+    that:
+      - "'started, controller-0, https://10.240.0.10:2380, https://10.240.0.10:2379, false' in etcd_member.stdout"
+      - "'started, controller-1, https://10.240.0.11:2380, https://10.240.0.11:2379, false' in etcd_member.stdout"
+      - "'started, controller-2, https://10.240.0.12:2380, https://10.240.0.12:2379, false' in etcd_member.stdout"
