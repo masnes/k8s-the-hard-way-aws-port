@@ -67,7 +67,8 @@
   connection: local
   tasks:
     - name: "worker nodes - slightly custom config"
-      include_role: generate-k8s-config-files-for-auth
+      include_role:
+        name: generate-k8s-config-files-for-auth
       vars:
         conffile:
           target: "node {{item}}"
@@ -81,7 +82,8 @@
         - "worker-1"
         - "worker-2"
     - name: "generalized configs (all non worker nodes)"
-      include_role: generate-k8s-config-files-for-auth
+      include_role:
+        name: generate-k8s-config-files-for-auth
       vars:
         conffile:
           target: "{{item.name}}"
@@ -135,7 +137,9 @@
 
 - name: "Deploy the Encryption Config File"
   hosts: controllers
-  copy:
-    src: secure/encryption-config.yaml
-    dest: "/var/lib/k8s_secrets/encryption-config.yaml"
-    mode: "600"
+  tasks:
+    - copy:
+        src: 'secure/encryption-config.yaml'
+        dest: "/var/lib/k8s_secrets/encryption-config.yaml"
+        mode: "600"
+
