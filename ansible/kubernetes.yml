@@ -1,7 +1,3 @@
-- name: Populate HostVars for workers and controllers
-  hosts: workers:controllers
-  tasks: []
-
 - name: Provision CA and Generate TLS Certificates
   hosts: 127.0.0.1
   connection: local
