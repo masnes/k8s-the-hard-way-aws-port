@@ -50,7 +50,7 @@
       --endpoints=https://127.0.0.1:2379
       --cacert=/var/lib/k8s_secrets/ca.pem
       --cert=/var/lib/k8s_secrets/kubernetes.pem
-      --key=/etc/etcd/kubernetes-key.pem
+      --key=/var/lib/k8s_secrets/kubernetes-key.pem
   register: etcd_member
 
 - name: "etcd out:"

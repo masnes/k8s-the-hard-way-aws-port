@@ -32,7 +32,7 @@
   tasks:
     - name: Deploy Certificates
       copy:
-        src: "secrets/{{item}}"
+        src: "secure/{{item}}"
         dest: "/var/lib/k8s_secrets/{{item}}"
         mode: "750"
         owner: root
@@ -46,6 +46,7 @@
 
 - name: Deploy Controller Certificates
   hosts: controllers
+  become: yes
   tasks:
     - name: Deploy Extra certs for controllers
       copy:
@@ -137,6 +138,7 @@
 
 - name: "Deploy the Encryption Config File"
   hosts: controllers
+  become: yes
   tasks:
     - copy:
         src: 'secure/encryption-config.yaml'
