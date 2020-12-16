@@ -3,6 +3,7 @@
   apt:
     name: "etcd-server"
     state: "latest"
+    update_cache: yes
 
 - name: "Install etcd-client"
   apt:
