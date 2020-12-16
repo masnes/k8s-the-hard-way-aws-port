@@ -97,7 +97,7 @@
         - { name: "kube-proxy", url: "https://{{kubernetes_public_address}}:6443" }
         - { name: "kube-controller-manager", url: "https://127.0.0.1:6443" }
         - { name: "kube-scheduler", url: "https://127.0.0.1:6443" }
-        - { name: "kube-scheduler", url: "https://127.0.0.1:6443" }
+        - { name: "admin", url: "https://127.0.0.1:6443" }
   tags:
     - auth_config_files
 
@@ -123,7 +123,6 @@
         src: "kubeconfig/{{item}}"
         dest: "{{ansible_env.HOME}}/{{item}}"
       loop:
-        - "{{inventory_hostname}}.kubeconfig"
         - "admin.kubeconfig"
         - "kube-controller-manager.kubeconfig"
         - "kube-scheduler.kubeconfig"
