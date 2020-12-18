@@ -61,6 +61,6 @@
 - name: "Check that etcd output contains our controllers"
   assert:
     that:
-      - "'started, controller-0, https://10.240.0.10:2380, https://10.240.0.10:2379, false' in etcd_member.stdout"
-      - "'started, controller-1, https://10.240.0.11:2380, https://10.240.0.11:2379, false' in etcd_member.stdout"
-      - "'started, controller-2, https://10.240.0.12:2380, https://10.240.0.12:2379, false' in etcd_member.stdout"
+      - "'started, controller-0, https://10.240.0.10:2380, https://10.240.0.10:2379' in etcd_member.stdout"
+      - "'started, controller-1, https://10.240.0.11:2380, https://10.240.0.11:2379' in etcd_member.stdout"
+      - "'started, controller-2, https://10.240.0.12:2380, https://10.240.0.12:2379' in etcd_member.stdout"
