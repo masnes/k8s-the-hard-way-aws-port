@@ -41,7 +41,7 @@
   systemd:
     name: "etcd.service"
     enabled: yes
-    state: started
+    state: "restarted"
     daemon_reload: "{{etcd_service.changed}}"
 
 - name: "Record Key etcd details for verification"
