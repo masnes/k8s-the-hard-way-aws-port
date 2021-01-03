@@ -147,3 +147,11 @@
     - role: "bootstrap-etcd-cluster"
   tags:
     - etcd
+
+- name: "Provision Control Plane"
+  hosts: controllers
+  become: yes
+  roles:
+    - role: "provision-k8s-control-plane"
+  tags:
+    - control_plane
