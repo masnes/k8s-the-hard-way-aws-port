@@ -152,6 +152,6 @@
   hosts: controllers
   become: yes
   roles:
-    - role: "provision-k8s-control-plane"
+    - role: "k8s-control-plane-provision"
   tags:
     - control_plane
