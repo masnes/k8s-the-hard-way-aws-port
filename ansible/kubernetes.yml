@@ -153,5 +153,7 @@
   become: yes
   roles:
     - role: "k8s-control-plane-provision"
+    - role: "k8s-control-plane-https-checks"
+    - role: "k8s-control-plane-verify"
   tags:
     - control_plane

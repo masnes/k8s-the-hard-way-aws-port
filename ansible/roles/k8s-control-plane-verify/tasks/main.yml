@@ -1,0 +1,18 @@
+---
+- name: get kubectl component statuses
+  command:
+    cmd: kubectl get componentstatuses --kubeconfig admin.kubeconfig
+  register: componentstatuses
+
+- name: debug component statuses
+  debug:
+    msg: "{{componentstatuses}}"
+
+- name: validate that compontent statuses are green
+  assert:
+    that:
+      - 'componentstatuses.stdout is search("scheduler[ 	]+Healthy")'
+      - 'componentstatuses.stdout is search("controller-manager[ 	]+Healthy")'
+      - 'componentstatuses.stdout is search("etcd-0[ 	]+Healthy")'
+      - 'componentstatuses.stdout is search("etcd-1[ 	]+Healthy")'
+      - 'componentstatuses.stdout is search("etcd-2[ 	]+Healthy")'
