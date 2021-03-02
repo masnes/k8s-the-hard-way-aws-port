@@ -2,7 +2,7 @@
 - name: install nginx
   apt:
     name: nginx
-    state: installed
+    state: present
 
 - name: config nginx sites available
   template:
