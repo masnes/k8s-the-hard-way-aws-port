@@ -116,7 +116,7 @@
 - name: Create kube-scheduler config
   template:
     src: kube-scheduler.yaml.j2
-    dest: /var/lib/kubernetes/kube-scheduler.yaml
+    dest: /etc/kubernetes/config/kube-scheduler.yaml
     owner: root
     group: root
     mode: "644"
