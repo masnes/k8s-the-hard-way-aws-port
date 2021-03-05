@@ -5,7 +5,9 @@ resource "aws_instance" "controller" {
 
   key_name = var.key_name
 
-  instance_type = "t2.nano" # TODO: this will need to be beefed up but keep it cheap for now
+  # TODO: this will need to be beefed up but keep it cheap for now
+  # Addendum: slightly beefed up now.
+  instance_type = "t2.medium"
 
   subnet_id = aws_subnet.k8s.id
 
