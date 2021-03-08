@@ -9,7 +9,7 @@
     cmd: |
       kubectl config set-cluster kubernetes-the-hard-way \
       --certificate-authority=../secure/ca.pem \
-      --embeded-certs=true \
+      --embed-certs=true \
       --server={{conffile.server_url}} \
       --kubeconfig={{conffile.kubeconfig}}
 
