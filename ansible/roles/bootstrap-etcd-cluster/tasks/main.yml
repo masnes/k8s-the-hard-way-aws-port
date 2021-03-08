@@ -37,7 +37,7 @@
     - "kubernetes-key.pem"
     - "ca.pem"
 
-- name: "Enable and Start etcd"
+- name: "Enable and (re)start etcd"
   systemd:
     name: "etcd.service"
     enabled: yes
