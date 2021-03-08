@@ -8,7 +8,7 @@
   debug:
     msg: "{{componentstatuses}}"
 
-- name: validate that compontent statuses are green
+- name: validate that component statuses are green
   assert:
     that:
       - 'componentstatuses.stdout is search("scheduler[ 	]+Healthy")'
@@ -16,3 +16,17 @@
       - 'componentstatuses.stdout is search("etcd-0[ 	]+Healthy")'
       - 'componentstatuses.stdout is search("etcd-1[ 	]+Healthy")'
       - 'componentstatuses.stdout is search("etcd-2[ 	]+Healthy")'
+
+- name: curl the healthz endpoint
+  command: "curl -H 'Host: kubernetes.default.svc.cluster.local' -i http://127.0.0.1/healthz"
+  register: healthz_curl
+
+- name: "debug curl output"
+  debug:
+    msg: "{{healthz_curl}}"
+
+- name: validate the curl response
+  assert:
+    that:
+      - 'healthz_curl.stdout is search("200 OK")'
+      - 'healthz_curl.stdout is search("\bok\b")'
