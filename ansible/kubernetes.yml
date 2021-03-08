@@ -159,6 +159,7 @@
     - control_plane
 
 - name: "Setup RBAC for Control Plane"
+  # Commands only need to be run on a single controller
   hosts: controllers[0]
   roles:
     - role: "k8s-control-plane-rbac"
