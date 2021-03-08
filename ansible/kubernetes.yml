@@ -157,3 +157,11 @@
     - role: "k8s-control-plane-verify"
   tags:
     - control_plane
+
+- name: "Setup RBAC for Control Plane"
+  hosts: controllers[0]
+  roles:
+    - role: "k8s-control-plane-rbac"
+  tags:
+    - control_plane
+    - control_plane_rbac
