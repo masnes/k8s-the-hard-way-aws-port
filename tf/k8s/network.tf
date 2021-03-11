@@ -100,6 +100,7 @@ resource "aws_lb_target_group" "k8s_api_server" {
 resource "aws_lb_listener" "k8s" {
   load_balancer_arn = aws_lb.k8s.arn
   port = 6443
+  protocol = "TCP"
 
   default_action {
     type = "forward"
