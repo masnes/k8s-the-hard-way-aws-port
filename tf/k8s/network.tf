@@ -108,7 +108,7 @@ resource "aws_lb_listener" "k8s" {
 }
 
 resource "aws_lb_target_group_attachment" "k8s-controllers" {
-  for_each = toset(aws_instance.controller.*)
+  count = length(aws_instance.controller)
   target_group_arn = aws_lb_target_group.k8s_api_server.arn
-  target_id = each.value.id
+  target_id = aws_instance.controller[count.index].id
 }
