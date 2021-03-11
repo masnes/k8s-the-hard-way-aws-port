@@ -77,6 +77,38 @@ resource "aws_eip" "k8s_external" {
 resource "aws_lb" "k8s" {
   name = "k8s-the-hard-way-load-balancer"
   load_balancer_type = "network"
-  subnet_id = aws_subnet.k8s.id
-  allocation_id = aws_eip.k8s_external.id
+
+  subnet_mapping {
+    subnet_id = aws_subnet.k8s.id
+    allocation_id = aws_eip.k8s_external.id
+  }
+
+}
+
+resource "aws_lb_target_group" "k8s_api_server" {
+  name = "k8s-the-hard-way-lb-tgt-api-srv"
+  port = 6443
+  protocol = "TCP"
+  vpc_id = aws_vpc.k8s.id
+
+  health_check {
+    port = 80
+    path = "/healthz"
+  }
+}
+
+resource "aws_lb_listener" "k8s" {
+  load_balancer_arn = aws_lb.k8s.arn
+  port = 6443
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.k8s_api_server.arn
+  }
+}
+
+resource "aws_lb_target_group_attachment" "k8s-controllers" {
+  for_each = aws_instance.controller
+  target_group_arn = aws_lb_target_group.k8s_api_server.arn
+  target_id = each.value.id
 }
