@@ -73,3 +73,10 @@ resource "aws_security_group" "k8s" {
 resource "aws_eip" "k8s_external" {
   vpc = true
 }
+
+resource "aws_lb" "k8s" {
+  name = "k8s-the-hard-way-load-balancer"
+  load_balancer_type = "network"
+  subnet_id = aws_subnet.k8s.id
+  allocation_id = aws_eip.k8s_external.id
+}
