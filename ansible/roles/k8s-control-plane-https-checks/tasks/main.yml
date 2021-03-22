@@ -12,6 +12,12 @@
     group: root
     mode: "644"
 
+- name: set nginx sites as enabled
+  file:
+    state: link
+    src: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
+    path: /etc/nginx/sites-enabled/kubernetes.default.svc.cluster.local
+
 - name: enabled and (re)start nginx
   systemd:
     name: nginx
