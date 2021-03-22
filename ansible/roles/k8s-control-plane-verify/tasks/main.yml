@@ -29,4 +29,3 @@
   assert:
     that:
       - 'healthz_curl.stdout is search("200 OK")'
-      - 'healthz_curl.stdout is search("\bok\b")'
