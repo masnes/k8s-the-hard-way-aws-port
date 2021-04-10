@@ -1,4 +1,13 @@
 ---
+- name: Place the admin.kubeconfig
+  become: true
+  copy:
+    src: kubeconfig/admin.kubeconfig
+    dest: /var/lib/kubernetes/
+    owner: root
+    group: root
+    mode: "644"
+
 - name: "Create system:kube-apiserver-to-kubelet ClusterRole"
   # Permissions to access the Kubelet API and to perform most common tasks associated with managing pods
   shell:
