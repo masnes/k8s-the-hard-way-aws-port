@@ -166,3 +166,11 @@
   tags:
     - control_plane
     - control_plane_rbac
+
+- name: "Setup Kubernetes Worker Nodes"
+  become: yes
+  hosts: workers
+  roles:
+    - role: "k8s-worker-nodes-provision"
+  tags:
+    - workers
