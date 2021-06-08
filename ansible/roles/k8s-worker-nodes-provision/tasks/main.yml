@@ -89,7 +89,72 @@
     src: containerd_config.toml.j2
     dest: /etc/containerd/config.toml
 
-- name: Create the containerd
+- name: Create the containerd.service systemd file
   template:
     src: containerd.service.j2
     dest: /etc/systemd/system/containerd.service
+
+- name: Create kubelet dirs
+  file:
+    path :"{{item}}"
+    state: directory
+    mode :"755"
+  loop:
+  - - "/var/lib/kubernetes"
+    - "/var/lib/kubelet"
+    - "/var/lib/kubelet/kubeconfig"
+    - "/var/lib/kube-proxy"
+    - "/var/lib/kube-proxy/kubeconfig"
+
+- name: Add key
+  copy:
+    src: secure/{{inventory_hostname}}.pem
+    dest: /var/lib/kubelet
+    mode: "644" # TODO
+
+- name: Add kubeconfig
+  copy:
+    src: kubeconfig/{{inventory_hostname}}.kubeconfig
+    dest: /var/lib/kubelet/kubeconfig/
+    mode: "644" # TODO
+
+- name: Add ca.pem
+  copy:
+    src: secure/ca.pem
+    dest: /var/lib/kubernetes/
+
+- name: Create the kubelet-config.yaml config file
+  template:
+    src: kubelet-config.yaml.j2
+    dest: /var/lib/kubelet/kubelet-config.yaml
+
+- name: Create the kubelet.service systemd unit file
+  template:
+    src: kubelet.service.j2
+    dest: /etc/systemd/system/kubelet.service
+
+- name: Copy the kubernetes proxy config
+  copy:
+    src: kubeconfig/kube-proxy.kubeconfig
+    dest: /var/lib/kube-proxy/kubeconfig/
+
+- name: Create the kube-proxy-config.yaml configuration file
+  template:
+    src: kube-proxy-config.yaml.j2
+    dest: /var/lib/kube-proxy/kubeconfig/kube-proxy-config.yaml
+
+- name: Create the kube-proxy.service systemd unit file
+  template:
+    src: kube-proxy.service.j2
+    dest: /etc/systemd/system/kube-proxy.service
+
+- name: Enable and (re)start the worker services
+  systemd:
+    name: "{{item}}"
+    state: restarted
+    enabled: yes
+    daemon_reload: yes
+  loop:
+    - "containerd"
+    - "kubelet"
+    - "kube-proxy"
