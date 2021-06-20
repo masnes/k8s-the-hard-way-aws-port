@@ -22,6 +22,7 @@
     state: directory
     path: "{{item}}"
   loop:
+    - /etc/containerd
     - /etc/cni/net.d
     - /opt/cni/bin
     - /var/lib/kubelet
@@ -96,11 +97,11 @@
 
 - name: Create kubelet dirs
   file:
-    path :"{{item}}"
+    path: "{{item}}"
     state: directory
-    mode :"755"
+    mode: "755"
   loop:
-  - - "/var/lib/kubernetes"
+    - "/var/lib/kubernetes"
     - "/var/lib/kubelet"
     - "/var/lib/kubelet/kubeconfig"
     - "/var/lib/kube-proxy"
