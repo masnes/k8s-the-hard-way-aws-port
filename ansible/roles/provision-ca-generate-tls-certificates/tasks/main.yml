@@ -28,7 +28,6 @@
     cmd: |
       cfssl gencert -initca ../csr/ca-csr.json | cfssljson -bare ca
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/ca.pem"
 
 - name: create admin-csr.json
   template:
@@ -47,7 +46,6 @@
       -profile=kubernetes
       ../csr/admin-csr.json | cfssljson -bare admin
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/admin.pem"
 
 - name: create worker csrs
   template:
@@ -71,7 +69,6 @@
       -profile=kubernetes
       ../csr/worker-{{item}}-csr.json | cfssljson -bare worker-{{item}}
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/worker-{{item}}.pem"
   loop:
     - "0"
     - "1"
@@ -94,7 +91,6 @@
       -profile=kubernetes
       ../csr/kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/kube-controller-manager.pem"
 
 
 - name: create kube proxy client csr
@@ -114,7 +110,6 @@
       -profile=kubernetes
       ../csr/kube-proxy-csr.json | cfssljson -bare kube-proxy
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/kube-proxy.pem"
 
 - name: create scheduler client csr
   template:
@@ -133,7 +128,6 @@
       -profile=kubernetes
       ../csr/kube-scheduler-csr.json | cfssljson -bare kube-scheduler
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/kube-scheduler.pem"
 
 - name: create api server csr
   template:
@@ -176,4 +170,3 @@
       -profile=kubernetes
       ../csr/service-account-csr.json | cfssljson -bare service-account
     chdir: "{{playbook_dir}}/files/secure"
-    creates: "{{playbook_dir}}/files/secure/service-account.pem"
