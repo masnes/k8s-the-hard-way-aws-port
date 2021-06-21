@@ -52,7 +52,7 @@
     src: generic-csr.json.j2
     dest: "{{playbook_dir}}/files/csr/worker-{{item}}-csr.json"
   vars:
-    csr_CN: "system:node:{{item}}"  # TODO: does this break?
+    csr_CN: "system:node:worker-{{item}}"  # TODO: does this break?
     csr_O: "system:nodes"
   with_items:
     - "0"
@@ -65,7 +65,7 @@
       -ca=ca.pem
       -ca-key=ca-key.pem
       -config=../csr/ca-config.json
-      -hostname=worker-{{item}},{{hostvars["worker-"+item].public_ip}},{{hostvars["worker-"+item].internal_ip}}
+      -hostname=worker-{{item}},{{hostvars["worker-"+item].public_ip}},{{hostvars["worker-"+item].internal_ip}},ip-{{hostvars["worker-"+item].internal_ip | regex_replace('\.', '-')}}
       -profile=kubernetes
       ../csr/worker-{{item}}-csr.json | cfssljson -bare worker-{{item}}
     chdir: "{{playbook_dir}}/files/secure"
