@@ -107,11 +107,15 @@
     - "/var/lib/kube-proxy"
     - "/var/lib/kube-proxy/kubeconfig"
 
-- name: Add key
+- name: Add cert and key
   copy:
-    src: secure/{{inventory_hostname}}.pem
-    dest: /var/lib/kubelet
+    src: secure/{{inventory_hostname}}{{item}}.pem
+    dest: /var/lib/kubelet/
     mode: "644" # TODO
+  loop:
+    - ""
+    - "-key"
+
 
 - name: Add kubeconfig
   copy:
