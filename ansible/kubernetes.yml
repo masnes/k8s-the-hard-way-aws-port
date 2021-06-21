@@ -5,6 +5,7 @@
     - role: provision-ca-generate-tls-certificates
   tags:
     - certificates
+    - certs
 
 - name: "Create secrets directory for all servers"
   hosts: all
