@@ -197,6 +197,12 @@
       loop:
         - "{{kubectl_get_nodes.stdout}}"
         - "{{kubectl_get_nodes.stderr}}"
+    - name: Check worker nodes are running
+      assert:
+        that:
+          - 'kubectl_get_nodes.stdout is search("worker-0\s+Ready")'
+          - 'kubectl_get_nodes.stdout is search("worker-1\s+Ready")'
+          - 'kubectl_get_nodes.stdout is search("worker-2\s+Ready")'
   tags:
     - workers
     - worker_validate
