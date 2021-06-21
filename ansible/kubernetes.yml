@@ -69,7 +69,7 @@
       vars:
         conffile:
           target: "node {{item}}"
-          server_url: "https://{{kubernetes_public_address}}:6443"
+          server_url: "https://{{kubernetes_address_private}}:6443"
           kubeconfig: "{{item}}.kubeconfig"
           client_certificate: "{{item}}.pem"
           client_key: "{{item}}-key.pem"
@@ -90,7 +90,7 @@
           client_key: "{{item.name}}-key.pem"
           credential_target: "{{item.name}}"
       loop:
-        - { name: "kube-proxy", url: "https://{{kubernetes_public_address}}:6443" }
+        - { name: "kube-proxy", url: "https://{{kubernetes_address_private}}:6443" }
         - { name: "kube-controller-manager", url: "https://127.0.0.1:6443" }
         - { name: "kube-scheduler", url: "https://127.0.0.1:6443" }
         - { name: "admin", url: "https://127.0.0.1:6443" }
