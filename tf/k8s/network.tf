@@ -74,6 +74,15 @@ resource "aws_eip" "k8s_external" {
   vpc = true
 }
 
+data "aws_eip" "k8s_internal" {
+  # The k8s external eip won't have a private ip until the aws lb using it finishes spinning up
+  # Retrieving the value here avoids a need to perform a terraform refresh
+  id = aws_eip.k8s_external.id
+  depends_on = [
+    aws_lb.k8s
+  ]
+}
+
 resource "aws_lb" "k8s" {
   name = "k8s-the-hard-way-load-balancer"
   load_balancer_type = "network"
