@@ -198,5 +198,5 @@
         - "{{kubectl_get_nodes.stdout}}"
         - "{{kubectl_get_nodes.stderr}}"
   tags:
-    - worker
+    - workers
     - worker_validate
