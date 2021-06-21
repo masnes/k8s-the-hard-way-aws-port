@@ -1,6 +1,7 @@
 resource "local_file" "kubernetes_public_address" {
   depends_on = [
-    aws_eip.k8s_external
+    aws_eip.k8s_external,
+    aws_lb.k8s
   ]
   filename             = "${path.module}/../../ansible/group_vars/all/kubernetes_public_address.yml"
   file_permission      = "0644"
