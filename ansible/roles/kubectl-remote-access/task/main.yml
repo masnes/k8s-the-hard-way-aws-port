@@ -1,0 +1,35 @@
+- name: Generate a kubeconfig file suitable for authenticating as the admin user
+  shell:
+    cmd: |
+      kubectl config set-cluster kubernetes-the-hard-way \
+        --certificate-authority=ca.pem \
+        --embed-certs=true \
+        --server=https://{{kubernetes_address_public}}:6443
+
+      kubectl config set-credentials admin \
+        --client-certificate={{playbook_dir}}/files/secure/admin.pem \
+        --client-key={{playbook_dir}}/files/secure/admin-key.pem
+
+      kubectl config set-context kubernetes-the-hard-way \
+        --cluster=kubernetes-the-hard-way \
+        --user=admin
+
+      kubectl config use-context kubernetes-the-hard-way
+    chdir: "{{playbook_dir}}/"
+
+- name: Attempt to get nodes -- for verifying the admin config
+  command:
+    cmd: "kubectl get nodes"
+    chdir: "{{playbook_dir}}/"
+  register: kubectl_nodes
+
+- name: Show 'kubectl get nodes' output
+  debug:
+    var: kubectl_nodes
+
+- name: Confirm that all nodes show up in the output
+  assert:
+    that:
+      - "kubectl_nodes.stdout is search('worker-0\s+Ready')"
+      - "kubectl_nodes.stdout is search('worker-1\s+Ready')"
+      - "kubectl_nodes.stdout is search('worker-2\s+Ready')"
