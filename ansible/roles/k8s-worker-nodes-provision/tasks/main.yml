@@ -20,7 +20,7 @@
 - name: Set hostname to worker identifier
   hostname:
     name: "{{inventory_hostname}}"
-    strategy: systemd
+    use: systemd
 
 - name: Create installation directories
   file:
