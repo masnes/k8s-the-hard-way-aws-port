@@ -175,3 +175,28 @@
     - role: "k8s-worker-nodes-provision"
   tags:
     - workers
+
+
+- name: "Debug Kubernetes Worker Nodes Found"
+  # Command only needs to be run on a single controller
+  hosts: controllers[0]
+  tasks:
+    - name: "Check worker node status"
+      command:
+        argv:
+          - kubectl
+          - get
+          - nodes
+          - '--kubeconfig'
+          - '/var/lib/kubernetes/admin.kubeconfig'
+      changed_when: false
+      register: kubectl_get_nodes
+    - name: "Print worker node status"
+      debug:
+        msg: "{{item}}"
+      loop:
+        - "{{kubectl_get_nodes.stdout}}"
+        - "{{kubectl_get_nodes.stderr}}"
+  tags:
+    - worker
+    - worker_validate
