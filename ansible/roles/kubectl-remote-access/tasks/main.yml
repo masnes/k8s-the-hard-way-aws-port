@@ -16,6 +16,26 @@
 
       kubectl config use-context kubernetes-the-hard-way
     chdir: "{{playbook_dir}}/"
+  register: kubeconfig
+
+- name: Print kubeconfig
+  debug:
+    var: kubeconfig
+
+- name: Check version
+  command:
+    cmd: "kubectl version"
+    chdir: "{{playbook_dir}}/"
+  register: kubectl_version
+
+- name: Show kubectl version
+  debug:
+    var: kubectl_version
+
+- name: Assert that the server is found
+  assert:
+    that:
+      - 'kubectl_version.stdout is Search("Server Version:\s+version.Info")'
 
 - name: Attempt to get nodes -- for verifying the admin config
   command:
@@ -30,6 +50,6 @@
 - name: Confirm that all nodes show up in the output
   assert:
     that:
-      - "kubectl_nodes.stdout is search('worker-0\s+Ready')"
-      - "kubectl_nodes.stdout is search('worker-1\s+Ready')"
-      - "kubectl_nodes.stdout is search('worker-2\s+Ready')"
+      - 'kubectl_nodes.stdout is search("worker-0\s+Ready")'
+      - 'kubectl_nodes.stdout is search("worker-1\s+Ready")'
+      - 'kubectl_nodes.stdout is search("worker-2\s+Ready")'
