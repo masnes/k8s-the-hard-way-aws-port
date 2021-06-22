@@ -2,7 +2,7 @@
   shell:
     cmd: |
       kubectl config set-cluster kubernetes-the-hard-way \
-        --certificate-authority=ca.pem \
+        --certificate-authority={{playbook_dir}}/files/secure/ca.pem \
         --embed-certs=true \
         --server=https://{{kubernetes_address_public}}:6443
 
