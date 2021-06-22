@@ -11,7 +11,7 @@
 - name: validate that component statuses are green
   assert:
     that:
-      - 'cluster_info.stdout is search("Kubernetes control plan is running at")'
+      - 'cluster_info.stdout is search("Kubernetes control plan.*is running at")'
 
 - name: curl the healthz endpoint
   command: "curl -H 'Host: kubernetes.default.svc.cluster.local' -i http://127.0.0.1/healthz"
