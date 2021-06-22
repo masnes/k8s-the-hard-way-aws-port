@@ -168,3 +168,7 @@
     - "containerd"
     - "kubelet"
     - "kube-proxy"
+
+- name: "Give the worker services 20 seconds to spool up"
+  pause:
+    seconds: 20
