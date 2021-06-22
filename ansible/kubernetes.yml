@@ -207,7 +207,7 @@
     - workers
     - worker_validate
 
-- name: Provision CA and Generate TLS Certificates
+- name: Setup Remote Access Kubeconfig
   hosts: 127.0.0.1
   connection: local
   roles:
