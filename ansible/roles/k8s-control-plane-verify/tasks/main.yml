@@ -1,21 +1,17 @@
 ---
 - name: get kubectl component statuses
   command:
-    cmd: kubectl get componentstatuses --kubeconfig admin.kubeconfig
-  register: componentstatuses
+    cmd: kubectl cluster-info --kubeconfig admin.kubeconfig
+  register: cluster_info
 
 - name: debug component statuses
   debug:
-    msg: "{{componentstatuses}}"
+    msg: "{{cluster_info}}"
 
 - name: validate that component statuses are green
   assert:
     that:
-      - 'componentstatuses.stdout is search("scheduler[ 	]+Healthy")'
-      - 'componentstatuses.stdout is search("controller-manager[ 	]+Healthy")'
-      - 'componentstatuses.stdout is search("etcd-0[ 	]+Healthy")'
-      - 'componentstatuses.stdout is search("etcd-1[ 	]+Healthy")'
-      - 'componentstatuses.stdout is search("etcd-2[ 	]+Healthy")'
+      - 'cluster_info.stdout is search("Kubernetes control plan is running at")'
 
 - name: curl the healthz endpoint
   command: "curl -H 'Host: kubernetes.default.svc.cluster.local' -i http://127.0.0.1/healthz"
