@@ -35,7 +35,7 @@
 - name: Assert that the server is found
   assert:
     that:
-      - 'kubectl_version.stdout is Search("Server Version:\s+version.Info")'
+      - 'kubectl_version.stdout is search("Server Version:\s+version.Info")'
 
 - name: Attempt to get nodes -- for verifying the admin config
   command:
