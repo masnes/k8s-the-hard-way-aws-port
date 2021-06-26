@@ -30,3 +30,4 @@ esac
 
 "$script_dir"/bin/schedule-destroy.sh "$1"
 "$script_dir/tf/apply.sh" apply
+"$script_dir/ansible/run-playbook.sh" "$script_dir/ansible/kubernetes.yml"
