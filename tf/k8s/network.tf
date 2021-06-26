@@ -23,6 +23,14 @@ resource "aws_route_table" "k8s" {
   }
 }
 
+# Allow pods on separate nodes to communicate
+resource "aws_route" "pod_cidr" {
+  count = 3
+  route_table_id = aws_route_table.k8s.id
+  destination_cidr_block = aws_instance.worker[count.index].tags["pod_cidr"]
+  instance_id = aws_instance.worker[count.index].id
+}
+
 resource "aws_subnet" "k8s" {
   vpc_id            = aws_vpc.k8s.id
   cidr_block        = aws_vpc.k8s.cidr_block
