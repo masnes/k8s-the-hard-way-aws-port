@@ -4,6 +4,12 @@ resource "aws_vpc" "k8s" {
   enable_dns_hostnames = true
 }
 
+resource "aws_vpc_ipv4_cidr_block_association" "cluster" {
+  # for the k8s cluster internal usage
+  vpc_id = aws_vpc.k8s.id
+  cidr_block = "10.200.0.0/16"
+}
+
 resource "aws_internet_gateway" "k8s" {
   vpc_id = aws_vpc.k8s.id
 
@@ -43,11 +49,26 @@ resource "aws_subnet" "k8s" {
   }
 }
 
+resource "aws_subnet" "cluster" {
+  vpc_id            = aws_vpc.k8s.id
+  cidr_block        = aws_vpc_ipv4_cidr_block_association.cluster.cidr_block
+  availability_zone = "us-west-2b"
+
+  tags = {
+    Name = "k8s"
+  }
+
+}
+
 resource "aws_route_table_association" "k8s" {
   subnet_id      = aws_subnet.k8s.id
   route_table_id = aws_route_table.k8s.id
 }
 
+resource "aws_route_table_association" "cluster" {
+  subnet_id      = aws_subnet.cluster.id
+  route_table_id = aws_route_table.k8s.id
+}
 
 resource "aws_security_group" "k8s" {
   name        = "k8s"
@@ -69,7 +90,10 @@ resource "aws_security_group" "k8s" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [aws_subnet.k8s.cidr_block]
+    cidr_blocks = [
+      aws_vpc.k8s.cidr_block,
+      aws_vpc_ipv4_cidr_block_association.cluster.cidr_block,
+    ]
   }
 
   egress {
