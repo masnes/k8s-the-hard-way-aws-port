@@ -14,13 +14,15 @@ resource "aws_internet_gateway" "k8s" {
 
 resource "aws_route_table" "k8s" {
   vpc_id = aws_vpc.k8s.id
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.k8s.id
-  }
   tags = {
     Name = "K8s Basic VPC Route Table"
   }
+}
+
+resource "aws_route" "default_internet"  {
+  route_table_id = aws_route_table.k8s.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id = aws_internet_gateway.k8s.id
 }
 
 # Allow pods on separate nodes to communicate
