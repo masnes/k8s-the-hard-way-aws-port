@@ -1,0 +1,7 @@
+- name: configure pod routes
+  become: yes
+  net_static_route:
+    prefix: '{{hostvars[groups["workers"][{{item}}]]["pod_cidr"] | regex_replace("/[0-9]+$", "")}}'
+    mask: 255.255.255.0
+    next_hop: '{{hostvars[groups["workers"][{{item}}]]["internal_ip"]}}'
+  loop: [0, 1, 2]

@@ -215,3 +215,8 @@
   tags:
     - remote_access
     - admin
+
+- name: Provision Pod Network Routes
+  hosts: all
+  roles:
+    - role: provision-pod-network-routes
