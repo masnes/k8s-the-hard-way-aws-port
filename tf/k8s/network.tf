@@ -4,12 +4,6 @@ resource "aws_vpc" "k8s" {
   enable_dns_hostnames = true
 }
 
-resource "aws_vpc_ipv4_cidr_block_association" "cluster" {
-  # for the k8s cluster internal usage
-  vpc_id = aws_vpc.k8s.id
-  cidr_block = "10.200.0.0/16"
-}
-
 resource "aws_internet_gateway" "k8s" {
   vpc_id = aws_vpc.k8s.id
 
@@ -31,14 +25,6 @@ resource "aws_route" "default_internet"  {
   gateway_id = aws_internet_gateway.k8s.id
 }
 
-# Allow pods on separate nodes to communicate
-resource "aws_route" "pod_cidr" {
-  count = 3
-  route_table_id = aws_route_table.k8s.id
-  destination_cidr_block = aws_instance.worker[count.index].tags["pod_cidr"]
-  instance_id = aws_instance.worker[count.index].id
-}
-
 resource "aws_subnet" "k8s" {
   vpc_id            = aws_vpc.k8s.id
   cidr_block        = aws_vpc.k8s.cidr_block
@@ -49,24 +35,8 @@ resource "aws_subnet" "k8s" {
   }
 }
 
-resource "aws_subnet" "cluster" {
-  vpc_id            = aws_vpc.k8s.id
-  cidr_block        = aws_vpc_ipv4_cidr_block_association.cluster.cidr_block
-  availability_zone = "us-west-2b"
-
-  tags = {
-    Name = "k8s"
-  }
-
-}
-
 resource "aws_route_table_association" "k8s" {
   subnet_id      = aws_subnet.k8s.id
-  route_table_id = aws_route_table.k8s.id
-}
-
-resource "aws_route_table_association" "cluster" {
-  subnet_id      = aws_subnet.cluster.id
   route_table_id = aws_route_table.k8s.id
 }
 
@@ -92,7 +62,7 @@ resource "aws_security_group" "k8s" {
     protocol    = "-1"
     cidr_blocks = [
       aws_vpc.k8s.cidr_block,
-      aws_vpc_ipv4_cidr_block_association.cluster.cidr_block,
+      var.cluster_cidr,
     ]
   }
 
