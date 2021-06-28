@@ -4,7 +4,7 @@ variable "key_name" {
 }
 
 variable "cluster_cidr" {
-  type = "string"
+  type = string
   description = "possible pod cidr range"
   default = "10.200.0.0/16"
 }
