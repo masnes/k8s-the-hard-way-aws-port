@@ -220,3 +220,6 @@
   hosts: all
   roles:
     - role: provision-pod-network-routes
+    # reference https://wiki.archlinux.org/title/systemd-networkd#network_files
+  tags:
+    - network

@@ -1,3 +1,4 @@
+# reference https://wiki.archlinux.org/title/systemd-networkd#network_files
 - name: add pod-routes.network systemd network file
   become: yes
   template:
