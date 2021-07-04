@@ -1,7 +1,14 @@
-- name: configure pod routes
+- name: add pod-routes.network systemd network file
   become: yes
-  net_static_route:
-    prefix: '{{hostvars[groups["workers"][{{item}}]]["pod_cidr"] | regex_replace("/[0-9]+$", "")}}'
-    mask: 255.255.255.0
-    next_hop: '{{hostvars[groups["workers"][{{item}}]]["internal_ip"]}}'
-  loop: [0, 1, 2]
+  template:
+    src: pod-routes.network.j2
+    dest: /etc/systemd/network/pod-routes.{{hostvars[item].inventory_hostname}}.network
+  loop: '{{groups["workers"]}}'
+
+- name: Load latest network configurations
+  become: yes
+  systemd:
+    name: systemd-networkd.service
+    state: restarted
+    enabled: yes
+    daemon_reload: true
