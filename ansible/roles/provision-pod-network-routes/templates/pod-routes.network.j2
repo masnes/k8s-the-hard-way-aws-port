@@ -1,0 +1,7 @@
+[Match]
+Name=en*
+
+[Network]
+IPForward=ipv4
+Address={{hostvars[item].pod_cidr}}
+Gateway={{hostvars[item].internal_ip}}
