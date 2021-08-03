@@ -223,3 +223,11 @@
     # reference https://wiki.archlinux.org/title/systemd-networkd#network_files
   tags:
     - network
+
+- name: Set workers to recognize additional routes
+  hosts: workers
+  roles:
+    - role: provision-pod-network-routes-worker-ips
+  tags:
+    - network
+    - worker_ips

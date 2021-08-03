@@ -1,0 +1,9 @@
+- name: Check if additional ip addresses have been enabled
+  changed_when: false
+  command: ip addr show
+  register: ip_addr_show
+
+- name: Add additional ip addresses
+  become: true
+  command: "ip addr add {{pod_cidr}} dev eth0"
+  when: "pod_cidr not in ip_addr_show.stdout"
