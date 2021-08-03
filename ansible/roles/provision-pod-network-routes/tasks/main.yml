@@ -1,15 +1,33 @@
-# reference https://wiki.archlinux.org/title/systemd-networkd#network_files
-- name: add pod-routes.network systemd network file
+- name: Set routes
   become: yes
-  template:
-    src: pod-routes.network.j2
-    dest: /etc/systemd/network/pod-routes.{{hostvars[item].inventory_hostname}}.network
+  command: "ip route replace {{hostvars[item].pod_cidr}} via {{hostvars[item].internal_ip}}"
   loop: '{{groups["workers"]}}'
 
-- name: Load latest network configurations
+- name: Add hosts entries for worker hosts
   become: yes
-  systemd:
-    name: systemd-networkd.service
-    state: restarted
-    enabled: yes
-    daemon_reload: true
+  blockinfile:
+    path: /etc/hosts
+    marker: "# {mark} ANSIBLE MANAGED BLOCK"
+    block: >
+      {%- set targets = [] -%}
+      {%- for worker in groups["workers"] -%}
+      {%- set _ = targets.append(worker.internal_ip ~ ' ' ~ worker.inventory_hostname) -%}
+      {%- endfor -%}
+      {{- targets -}}
+
+
+## reference https://wiki.archlinux.org/title/systemd-networkd#network_files
+#- name: add pod-routes.network systemd network file
+#  become: yes
+#  template:
+#    src: pod-routes.network.j2
+#    dest: /etc/systemd/network/pod-routes.{{hostvars[item].inventory_hostname}}.network
+#  loop: '{{groups["workers"]}}'
+#
+#- name: Load latest network configurations
+#  become: yes
+#  systemd:
+#    name: systemd-networkd.service
+#    state: restarted
+#    enabled: yes
+#    daemon_reload: true
