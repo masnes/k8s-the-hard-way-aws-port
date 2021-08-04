@@ -8,13 +8,10 @@
   blockinfile:
     path: /etc/hosts
     marker: "# {mark} ANSIBLE MANAGED BLOCK"
-    block: >
-      {%- set targets = [] -%}
-      {%- for worker in groups["workers"] -%}
-      {%- set _ = targets.append(worker.internal_ip ~ ' ' ~ worker.inventory_hostname) -%}
-      {%- endfor -%}
-      {{- targets -}}
-
+    block: |
+      {% for worker in groups["workers"] %}
+      {{hostvars[worker].internal_ip}} {{hostvars[worker].inventory_hostname}}
+      {% endfor %}
 
 ## reference https://wiki.archlinux.org/title/systemd-networkd#network_files
 #- name: add pod-routes.network systemd network file
