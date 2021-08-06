@@ -231,3 +231,11 @@
   tags:
     - network
     - worker_ips
+
+- name: Dns cluster addon
+  hosts: 127.0.0.1
+  connection: local
+  roles:
+    - role: dns-cluster-add-on
+  tags:
+    - dns_cluster

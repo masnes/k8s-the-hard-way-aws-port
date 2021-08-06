@@ -1,0 +1,57 @@
+---
+- name: Deploy the coredns cluster add on
+  command: kubectl apply -f https://storage.googleapis.com/kubernetes-the-hard-way/coredns-1.8.yaml
+
+- name: get pods in kube-dns deployment
+  command: kubectl get pods -l k8s-app=kube-dns -n kube-system
+  changed_when: false
+  register: kube_dns_pods
+
+- name: Show output
+  debug:
+    var: kube_dns_pods
+
+- name: Check that the pods are running
+  assert:
+    that:
+      - 'kube_dns_pods.stdout_lines | length > 2'
+      - '"Running" in kube_dns_pods.stdout_lines[1]'
+      - '"Running" in kube_dns_pods.stdout_lines[2]'
+
+- name: Create busybox deployment
+  command: kubectl run busybox --image=busybox:1.28 --command -- sleep 3600
+
+- name: Check pod created by busybox
+  command: kubectl get pods -l run=busybox
+  changed_when: false
+  register: busybox_pods
+
+- name: Show output
+  debug:
+    var: busybox_pods
+
+- name: Check that busybox pods are running
+  assert:
+    that:
+      - 'busybox_pods.stdout_lines | length > 1'
+      - '"Running" in kube_dns_pods.stdout_lines[1]'
+
+- name: Get busybox pod name
+  command: 'kubectl get pods -l run=busybox -o jsonpath="{.items[0].metadata.name}"'
+  register: busybox_pod_name
+
+- name: Execute DNS lookup for kubernetes service inside the busybox pod
+  command: kubectl exec -ti {{busybox_pod_name.stdout}} -- nslookup kubernetes
+  changed_when: false
+  register: dns_lookup
+
+- name: Print busybox dns details
+  debug:
+    var: dns_lookup
+
+- name: Assert that dns lookup succeeded
+  assert:
+    that:
+      - '"kubernetes" in dns_lookup.stdout'
+      - '"kubernetes.default.svc.cluster.local" in dns_lookup.stdout'
+      - '"kube-dns.kube-system.svc.cluster.local" in dns_lookup.stdout'
