@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if ! which at ; then
+  echo >&2 "Error. 'at' package is not installed. Cannot auto-schedule teardown."
+  exit 1
+fi
+
 script_dir="$(dirname "$(readlink -f "$0")")"
 
 job_contains_destroy_canary() {
